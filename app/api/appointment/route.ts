@@ -65,7 +65,7 @@ type Appointment = {
             status: 1,
             doctor: {
               _id: { $toString: "$doctorInfo._id" },
-              name: "Dr A Sharma",
+              name: "$doctorInfo.name",
               speciality: "$doctorInfo.speciality"
             }
           }
