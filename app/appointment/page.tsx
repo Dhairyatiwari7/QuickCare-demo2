@@ -66,8 +66,9 @@ export default function AppointmentPage() {
         const appointmentData = {
           doctorId: selectedDoctor._id,
           userId: user._id,
-          date: selectedDate.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+          date: selectedDate.toISOString().split('T')[0], 
           time: selectedTime,
+          status: "pending" 
         };
   
         console.log("Appointment data being sent:", appointmentData); // For debugging

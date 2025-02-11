@@ -90,12 +90,12 @@ export async function POST(req: NextRequest) {
     const db = client.db("test");
     const appointmentsCollection = db.collection<Appointment>("Appointment");
 
-    const { doctorId, userId, date, time } = await req.json();
+    const { doctorId, userId, date, time, status } = await req.json();
 
-    console.log("Received appointment data:", { doctorId, userId, date, time }); // For debugging
+    console.log("Received appointment data:", { doctorId, userId, date, time, status }); // Updated logging
 
-    if (!doctorId || !userId || !date || !time) {
-      console.error("Missing required fields:", { doctorId, userId, date, time }); // For debugging
+    if ( !date || !time || ) {
+      console.error("Missing required fields:", { doctorId, userId, date, time, status }); // Updated logging
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
       userId,
       date,
       time,
-      status: "pending" as const
+      status
     };
 
     const result = await appointmentsCollection.insertOne(newAppointment);
@@ -116,8 +116,9 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error booking appointment:", error);
     return NextResponse.json(
-      { error: "Failed to book appointment" },
+      { error: "Failed to book appointment", details: error.message },
       { status: 500 }
     );
   }
 }
+
