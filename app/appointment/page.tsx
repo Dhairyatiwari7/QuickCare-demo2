@@ -63,20 +63,25 @@ export default function AppointmentPage() {
   const handleBookAppointment = async () => {
     if (selectedDoctor && selectedDate && selectedTime && user) {
       try {
+        const appointmentData = {
+          doctorId: selectedDoctor._id,
+          userId: user._id,
+          date: selectedDate.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+          time: selectedTime,
+        };
+  
+        console.log("Appointment data being sent:", appointmentData); // For debugging
+  
         const response = await fetch('/api/appointment', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            doctorId: selectedDoctor._id,
-            userId: user._id,
-            date: selectedDate.toISOString(),
-            time: selectedTime,
-          }),
+          body: JSON.stringify(appointmentData),
         });
-
+  
         if (response.ok) {
+          const result = await response.json();
           setNotificationMessage(`Appointment booked with ${selectedDoctor.name} on ${selectedDate.toDateString()} at ${selectedTime}`);
           setShowNotification(true);
           setIsDialogOpen(false);
@@ -84,6 +89,7 @@ export default function AppointmentPage() {
           window.dispatchEvent(new Event('appointmentBooked'));
         } else {
           const errorData = await response.json();
+          console.error("Server response:", errorData); // For debugging
           setNotificationMessage(`Failed to book appointment: ${errorData.error}`);
           setShowNotification(true);
         }
@@ -92,9 +98,12 @@ export default function AppointmentPage() {
         setNotificationMessage('An error occurred while booking the appointment');
         setShowNotification(true);
       }
+    } else {
+      setNotificationMessage('Please select a doctor, date, and time');
+      setShowNotification(true);
     }
-  }
-
+  };
+  
   return (
     <div className="max-w-6xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <h1 className="appointment-content text-3xl font-bold text-center mb-8">Book an Appointment</h1>

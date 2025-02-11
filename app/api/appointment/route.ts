@@ -3,8 +3,8 @@ import clientPromise from "../../lib/db";
 import { ObjectId } from "mongodb";
 
 type Appointment = {
-  _id: ObjectId;
-  doctorId: string;
+  _id?: ObjectId;  
+  doctorId: ObjectId;
   userId: string;
   date: string;
   time: string;
@@ -92,12 +92,15 @@ export async function POST(req: NextRequest) {
 
     const { doctorId, userId, date, time } = await req.json();
 
+    console.log("Received appointment data:", { doctorId, userId, date, time }); // For debugging
+
     if (!doctorId || !userId || !date || !time) {
+      console.error("Missing required fields:", { doctorId, userId, date, time }); // For debugging
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const newAppointment = {
-      doctorId,
+      doctorId: new ObjectId(doctorId),
       userId,
       date,
       time,
