@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
 
     console.log("Received appointment data:", { doctorId, userId, date, time, status }); // Updated logging
 
-    if ( !date || !time || ) {
+    if ( !date || !time ) {
       console.error("Missing required fields:", { doctorId, userId, date, time, status }); // Updated logging
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
