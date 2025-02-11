@@ -30,13 +30,7 @@ export default function AppointmentPage() {
   const [showNotification, setShowNotification] = useState(false)
 
   useEffect(() => {
-/*************  ✨ Codeium Command ⭐  *************/
-  /**
-   * Fetches a list of doctors from the API and updates the component state.
-   *
-   * @throws {Error} if the API request fails
-   */
-/******  d30586e1-08a5-46a3-a14d-8edc13504d67  *******/
+  
     const fetchDoctors = async () => {
       try {
         const response = await fetch('/api/doctors')

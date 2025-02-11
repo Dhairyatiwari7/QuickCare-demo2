@@ -6,11 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
+
 type User = {
   _id: string;
   username: string;
   role: "user" | "doctor";
-};
+} | null;
 
 type Doctor = {
   _id: string;
@@ -125,28 +126,10 @@ export default function AppointmentsPage() {
                 <p>Speciality: {appointment.doctor?.speciality || "Not available"}</p>
                 <p>Date: {new Date(appointment.date).toLocaleDateString()}</p>
                 <p>Time: {appointment.time}</p>
-                <p className="capitalize">
-                  Status:{" "}
-                  <span
-                    className={`inline-block px-2 py-1 rounded-full text-sm ${
-                      appointment.status === "confirmed"
-                        ? "bg-green-100 text-green-800"
-                        : appointment.status === "cancelled"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-yellow-100 text-yellow-800"
-                    }`}
-                  >
-                    {appointment.status}
-                  </span>
-                </p>
+                <p>Status: {appointment.status}</p>
               </CardContent>
             </Card>
           ))}
-          <div className="mt-8 text-center">
-            <Button asChild>
-              <Link href="/appointment">Book New Appointment</Link>
-            </Button>
-          </div>
         </div>
       )}
     </div>
