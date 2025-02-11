@@ -35,43 +35,53 @@ type Appointment = {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
 
-    const appointments = await appointmentsCollection
-      .aggregate([
-        {
-          $match: { userId: '67a8784463abd080a76198ca' }
-        },
-        {
-          $lookup: {
-            from: "doctors",
-            localField: "doctorId",
-            foreignField: "_id",
-            as: "doctorInfo"
-          }
-        },
-        {
-          $unwind: {
-            path: "$doctorInfo",
-            preserveNullAndEmptyArrays: true
-          }
-        },
-        {
-          $project: {
-            _id: { $toString: "$_id" },
-            doctorId: { $toString: "$doctorId" },
+    const { ObjectId } = require('mongodb');
 
-            userId: 1,
-            date: 1,
-            time: 1,
-            status: 1,
-            doctor: {
-              _id: { $toString: "$doctorInfo._id" },
-              name: "$doctorInfo.name",
-              speciality: "$doctorInfo.speciality"
-            }
-          }
-        }
-      ])
-      .toArray();
+const appointments = await appointmentsCollection.aggregate([
+  {
+    $match: { userId: '67a8784463abd080a76198ca' }
+  },
+  {
+    $addFields: {
+      doctorId: { $toObjectId: "$doctorId" } // Convert doctorId to ObjectId
+    }
+  },
+  {
+    $lookup: {
+      from: "doctors",
+      localField: "doctorIdObj",
+      foreignField: "_id",
+      as: "doctorInfo"
+    }
+  },
+  {
+    $unwind: {
+      path: "$doctorInfo",
+      preserveNullAndEmptyArrays: true
+    }
+  },
+  {
+    $project: {
+      _id: { $toString: "$_id" },
+      doctorId: { $toString: "$doctorId" },
+      userId: 1,
+      date: 1,
+      time: 1,
+      status: 1,
+      doctor: {
+        _id: { $toString: "$doctorInfo._id" },
+        name: "$doctorInfo.name",
+        speciality: "$doctorInfo.speciality",
+        fees: "$doctorInfo.fees",
+        availability: "$doctorInfo.availability",
+        rating: "$doctorInfo.rating",
+        image: "$doctorInfo.image"
+      }
+    }
+  }
+]).toArray();
+
+
 
     console.log("API Processed Response:", JSON.stringify({ appointments }, null, 2));
 
