@@ -12,7 +12,6 @@ export interface IAppointment extends Document {
 const AppointmentSchema = new Schema<IAppointment>({
   doctorId: { type: String, required: true },
   userId: { type: String, required: true },
-  username: { type: String, required: true },
   date: { type: String, required: true },
   time: { type: String, required: true },
   status: { type: String, enum: ["pending", "confirmed", "cancelled"], default: "pending" },
