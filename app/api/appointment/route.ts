@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 type Appointment = {
   _id?: ObjectId;  
   doctorId: ObjectId;
-  userId: string;
+  userId: ObjectId;
   date: string;
   time: string;
   status: "pending" | "confirmed" | "cancelled";

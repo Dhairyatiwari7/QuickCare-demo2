@@ -36,16 +36,17 @@ export default function AppointmentsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchAppointments = useCallback(async () => {
-    if (!user || !user._id) {
-      setLoading(false);
-      return;
-    }
+    const id='67a8784463abd080a76198ca';
+    // if (!user || !user._id) {
+    //   setLoading(false);
+    //   return;
+    // }
 
     setLoading(true);
     setError(null);
-    console.log(user._id);
+    console.log(id);
     try {
-      const response = await fetch(`/api/appointment?userId=${user._id}`);
+      const response = await fetch(`/api/appointment?userId=${id}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch appointments");
