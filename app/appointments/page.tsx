@@ -1,17 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { gsap } from "gsap";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
 
-type User = {
+type AuthUser = {
   _id: string;
   username: string;
   role: "user" | "doctor";
-} | null;
+};
 
 type Doctor = {
   _id: string;
@@ -30,13 +29,16 @@ type Appointment = {
 };
 
 export default function AppointmentsPage() {
-  const { user } = useAuth();
+  const { user } = useAuth() as { user: AuthUser | null };
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || !user._id) return;
+    if (!user || !user._id) {
+      setLoading(false);
+      return;
+    }
   
     async function fetchAppointments() {
       setLoading(true);
@@ -47,20 +49,17 @@ export default function AppointmentsPage() {
         if (!response.ok) {
           throw new Error("Failed to fetch appointments");
         }
+        
         const data = await response.json();
-  
-        console.log("Fetched Appointments:", data);
-  
-        // Ensure appointments is an array before setting state
+        
         if (!data || !Array.isArray(data.appointments)) {
-          console.error("Invalid API response format:", data);
-          throw new Error("Unexpected response format");
+          throw new Error("Invalid response format");
         }
-        console.log("API response:", data);
+
         setAppointments(data.appointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
-        setError("Failed to load appointments. Please try again later.");
+        setError(error instanceof Error ? error.message : "Failed to load appointments");
       } finally {
         setLoading(false);
       }
@@ -68,7 +67,6 @@ export default function AppointmentsPage() {
   
     fetchAppointments();
   }, [user]);
-  
 
   if (!user) {
     return (

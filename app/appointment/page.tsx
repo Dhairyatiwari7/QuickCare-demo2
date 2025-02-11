@@ -20,8 +20,10 @@ import {
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Notification } from "@/components/notification"
+import { useAuth } from "../contexts/AuthContext"
 
 export default function AppointmentPage() {
+  const { user } = useAuth();
   const [doctors, setDoctors] = useState<{ _id: string; name: string; speciality: string; image: string; fees: number; availability: string; rating: number }[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedDoctor, setSelectedDoctor] = useState<{ _id: string; name: string; speciality: string; image: string; fees: number; availability: string; rating: number } | null>(null)
@@ -30,12 +32,11 @@ export default function AppointmentPage() {
   const [showNotification, setShowNotification] = useState(false)
 
   useEffect(() => {
-  
     const fetchDoctors = async () => {
       try {
         const response = await fetch('/api/doctors')
         const data = await response.json()
-        setDoctors(data)
+        setDoctors(data.doctors)
       } catch (error) {
         console.error("Error fetching doctors:", error)
       }
@@ -58,9 +59,30 @@ export default function AppointmentPage() {
       doctor.speciality.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleBookAppointment = () => {
-    if (selectedDoctor && selectedDate && selectedTime) {
-      setShowNotification(true)
+  const handleBookAppointment = async () => {
+    if (selectedDoctor && selectedDate && selectedTime && user) {
+      try {
+        const response = await fetch('/api/appointment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            doctorId: selectedDoctor._id,
+            userId: user._id,
+            date: selectedDate.toISOString(),
+            time: selectedTime,
+          }),
+        });
+
+        if (response.ok) {
+          setShowNotification(true);
+        } else {
+          console.error('Failed to book appointment');
+        }
+      } catch (error) {
+        console.error('Error booking appointment:', error);
+      }
     }
   }
 

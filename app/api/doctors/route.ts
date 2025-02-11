@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
-import clientPromise from "../../lib/db"; // ✅ Ensure correct DB import
+import clientPromise from "../../lib/db";
 
 export async function GET() {
   try {
     console.log("🔹 Connecting to MongoDB...");
     const client = await clientPromise;
-    const db = client.db("test"); // ✅ Ensure this matches your database name
+    const db = client.db("test");
 
     console.log("🔎 Fetching doctors...");
     const doctors = await db
       .collection("doctors")
-      .find({}, { projection: { password: 0 } }) // Exclude password
+      .find({}, { projection: { password: 0 } })
       .toArray();
 
     console.log("✅ Doctors fetched successfully!");
