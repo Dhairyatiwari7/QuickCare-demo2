@@ -29,7 +29,7 @@ type Appointment = {
     const appointmentsCollection = db.collection<Appointment>("Appointment");
 
     const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId");
+    const userId = 'abc1234';
 
     if (!userId) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     const newAppointment = {
       doctorId: doctorId,
-      userId   : userId,
+      userId   : 'abc1234',
       date,
       time,
       status
