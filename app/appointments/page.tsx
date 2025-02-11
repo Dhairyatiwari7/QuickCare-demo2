@@ -36,29 +36,27 @@ export default function AppointmentsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || !user._id) {
-      setLoading(false);
-      return;
-    }
-
+    if (!user || !user._id) return;
+  
     async function fetchAppointments() {
       setLoading(true);
       setError(null);
       try {
         const response = await fetch(`/api/appointment?userId=${user._id}`);
+  
         if (!response.ok) {
           throw new Error("Failed to fetch appointments");
         }
-
         const data = await response.json();
-        console.log("API Response:", data);
-
-        // Validate the API response to prevent 'filter is not a function' errors
+  
+        console.log("Fetched Appointments:", data);
+  
+        // Ensure appointments is an array before setting state
         if (!data || !Array.isArray(data.appointments)) {
           console.error("Invalid API response format:", data);
-          throw new Error("Unexpected response format. Please try again.");
+          throw new Error("Unexpected response format");
         }
-
+  
         setAppointments(data.appointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
@@ -67,20 +65,10 @@ export default function AppointmentsPage() {
         setLoading(false);
       }
     }
-
+  
     fetchAppointments();
-
-    // Ensure GSAP runs only when appointments are updated
-    if (appointments.length > 0) {
-      gsap.from(".appointment-card", {
-        opacity: 0,
-        y: 20,
-        stagger: 0.1,
-        duration: 0.8,
-        ease: "power3.out",
-      });
-    }
   }, [user]);
+  
 
   if (!user) {
     return (
