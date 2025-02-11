@@ -29,7 +29,7 @@ type Appointment = {
     const appointmentsCollection = db.collection<Appointment>("Appointment");
 
     const { searchParams } = new URL(req.url);
-    const userId = 'abc1234';
+    const userId = '67a8784463abd080a76198ca';
 
     if (!userId) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
@@ -38,7 +38,7 @@ type Appointment = {
     const appointments = await appointmentsCollection
       .aggregate([
         {
-          $match: { userId: userId }
+          $match: { userId: '67a8784463abd080a76198ca' }
         },
         {
           $lookup: {
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
     // console.log("Received appointment data:", { doctorId, userId, date, time, status }); // Updated logging
 
     if ( !date || !time ) {
-      console.error("Missing required fields:", { doctorId, userId, date, time, status }); // Updated logging
+      console.error("Missing required fields:", { doctorId, userId, date, time, status }); 
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
