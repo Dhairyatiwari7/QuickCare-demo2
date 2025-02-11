@@ -103,10 +103,11 @@ export async function POST(req: NextRequest) {
       console.error("Missing required fields:", { doctorId, userId, date, time, status }); 
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
-
+    
     const newAppointment = {
       doctorId: '67aa326e4c09158a3b227873',
       userId   : '67a8784463abd080a76198ca',
+      name : 'A Sharma',
       date,
       time,
       status

@@ -65,7 +65,7 @@ export default function AppointmentPage() {
       try {
         const appointmentData = {
           doctorId: selectedDoctor._id,
-          userId: user._id,
+          userId: '67a8784463abd080a76198ca',
           date: selectedDate.toISOString().split('T')[0], 
           time: selectedTime,
           status: "pending" 
