@@ -88,11 +88,16 @@ export async function POST(req: NextRequest) {
   try {
     const client = await clientPromise;
     const db = client.db("test");
+    // const userId = req.cookies.userId;
+    // if (!userId) {
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // }
+    // const doctorId = db.collection("doctors").findOne({ _id: new ObjectId(req.body.doctorId) });
     const appointmentsCollection = db.collection<Appointment>("Appointment");
 
-    const { doctorId, userId, date, time, status } = await req.json();
+    const { doctorId,userId, date, time, status } = await req.json();
 
-    console.log("Received appointment data:", { doctorId, userId, date, time, status }); // Updated logging
+    // console.log("Received appointment data:", { doctorId, userId, date, time, status }); // Updated logging
 
     if ( !date || !time ) {
       console.error("Missing required fields:", { doctorId, userId, date, time, status }); // Updated logging
@@ -100,8 +105,8 @@ export async function POST(req: NextRequest) {
     }
 
     const newAppointment = {
-      doctorId: new ObjectId(doctorId),
-      userId,
+      doctorId: doctorId,
+      userId   : userId,
       date,
       time,
       status
