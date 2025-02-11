@@ -8,9 +8,8 @@ import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
 type User = {
   _id: string;
-  email: string;
   username: string;
-  role: "user" | "doctor" | "patient";
+  role: "user" | "doctor";
 };
 
 type Doctor = {
@@ -36,31 +35,26 @@ export default function AppointmentsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !user._id) return;
 
     async function fetchAppointments() {
       setLoading(true);
       setError(null);
       try {
-        if (!user) return;
-        const response = await fetch(`/api/appointment/${user.role === "doctor" ? "/doctor" : ""}?username=${user.username}`);
+        const response = await fetch(`/api/appointment?userId=${user._id}`);
 
         if (!response.ok) {
           throw new Error("Failed to fetch appointments");
         }
         const data = await response.json();
 
-        // Fetch all doctors in one request instead of multiple
-        const doctorsResponse = await fetch(`/api/doctors`);
-        const { doctors } = await doctorsResponse.json();
-        const doctorMap = new Map(doctors.map((doctor: Doctor) => [doctor._id, doctor]));
+        console.log("Fetched Appointments:", data);
 
-        const updatedAppointments = data.appointments.map((appointment: Appointment) => ({
-          ...appointment,
-          doctor: doctorMap.get(appointment.doctorId) || null,
-        }));
+        if (!Array.isArray(data.appointments)) {
+          throw new Error("Invalid data format: Expected an array");
+        }
 
-        setAppointments(updatedAppointments);
+        setAppointments(data.appointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
         setError("Failed to load appointments. Please try again later.");
