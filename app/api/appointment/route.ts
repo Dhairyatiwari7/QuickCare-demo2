@@ -105,7 +105,7 @@ export async function POST(req: NextRequest) {
     }
 
     const newAppointment = {
-      doctorId: doctorId,
+      doctorId: '67aa326e4c09158a3b227873',
       userId   : '67a8784463abd080a76198ca',
       date,
       time,
