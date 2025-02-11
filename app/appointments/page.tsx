@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
+import doctor from "../models/doctor";
 
 type AuthUser = {
   _id: string;
@@ -42,8 +43,9 @@ export default function AppointmentsPage() {
 
     setLoading(true);
     setError(null);
+    console.log(user._id);
     try {
-      const response = await fetch(`/api/appointment?userId=abc1234`);
+      const response = await fetch(`/api/appointment?userId=${user._id}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch appointments");
