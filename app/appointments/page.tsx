@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -34,39 +34,56 @@ export default function AppointmentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const fetchAppointments = useCallback(async () => {
     if (!user || !user._id) {
       setLoading(false);
       return;
     }
-  
-    async function fetchAppointments() {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(`/api/appointment?userId=${user._id}`);
-  
-        if (!response.ok) {
-          throw new Error("Failed to fetch appointments");
-        }
-        
-        const data = await response.json();
-        
-        if (!data || !Array.isArray(data.appointments)) {
-          throw new Error("Invalid response format");
-        }
 
-        setAppointments(data.appointments);
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
-        setError(error instanceof Error ? error.message : "Failed to load appointments");
-      } finally {
-        setLoading(false);
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/appointment?userId=${user._id}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch appointments");
       }
+      
+      const data = await response.json();
+      
+      if (!data || !Array.isArray(data.appointments)) {
+        throw new Error("Invalid response format");
+      }
+
+      // Sort appointments by date, most recent first
+      const sortedAppointments = data.appointments.sort((a, b) => 
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+
+      setAppointments(sortedAppointments);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      setError(error instanceof Error ? error.message : "Failed to load appointments");
+    } finally {
+      setLoading(false);
     }
-  
-    fetchAppointments();
   }, [user]);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
+
+  useEffect(() => {
+    const handleAppointmentBooked = () => {
+      fetchAppointments();
+    };
+
+    window.addEventListener('appointmentBooked', handleAppointmentBooked);
+
+    return () => {
+      window.removeEventListener('appointmentBooked', handleAppointmentBooked);
+    };
+  }, [fetchAppointments]);
 
   if (!user) {
     return (
@@ -91,7 +108,7 @@ export default function AppointmentsPage() {
     return (
       <div className="max-w-4xl mx-auto py-12 px-4 text-center">
         <p className="text-red-500">{error}</p>
-        <Button onClick={() => window.location.reload()} className="mt-4">
+        <Button onClick={fetchAppointments} className="mt-4">
           Retry
         </Button>
       </div>

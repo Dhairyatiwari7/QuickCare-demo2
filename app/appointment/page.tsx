@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useState } from "react"
 import { gsap } from "gsap"
 import { Button } from "@/components/ui/button"
@@ -30,6 +29,8 @@ export default function AppointmentPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [selectedTime, setSelectedTime] = useState<string | undefined>(undefined)
   const [showNotification, setShowNotification] = useState(false)
+  const [notificationMessage, setNotificationMessage] = useState("")
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
 
   useEffect(() => {
     const fetchDoctors = async () => {
@@ -76,12 +77,20 @@ export default function AppointmentPage() {
         });
 
         if (response.ok) {
+          setNotificationMessage(`Appointment booked with ${selectedDoctor.name} on ${selectedDate.toDateString()} at ${selectedTime}`);
           setShowNotification(true);
+          setIsDialogOpen(false);
+          // Trigger a refresh of the appointments list
+          window.dispatchEvent(new Event('appointmentBooked'));
         } else {
-          console.error('Failed to book appointment');
+          const errorData = await response.json();
+          setNotificationMessage(`Failed to book appointment: ${errorData.error}`);
+          setShowNotification(true);
         }
       } catch (error) {
         console.error('Error booking appointment:', error);
+        setNotificationMessage('An error occurred while booking the appointment');
+        setShowNotification(true);
       }
     }
   }
@@ -118,7 +127,7 @@ export default function AppointmentPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Dialog>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
                   <Button className="w-full" onClick={() => setSelectedDoctor(doctor)}>
                     Book Appointment
@@ -161,8 +170,11 @@ export default function AppointmentPage() {
       </div>
       {showNotification && (
         <Notification
-          message={`Appointment booked with ${selectedDoctor?.name} on ${selectedDate?.toDateString()} at ${selectedTime}`}
-          onClose={() => setShowNotification(false)}
+          message={notificationMessage}
+          onClose={() => {
+            setShowNotification(false);
+            setNotificationMessage('');
+          }}
         />
       )}
     </div>
