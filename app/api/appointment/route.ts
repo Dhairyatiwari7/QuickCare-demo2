@@ -1,34 +1,30 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import clientPromise from "../../lib/db";
+import { NextRequest, NextResponse } from "next/server";
+import clientPromise from "../../lib/db"; // Ensure this is the correct path to your database connection
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    try {
-        const client = await clientPromise;
-        const db = client.db("test");
+export async function GET(req: NextRequest) {
+  try {
+    // Get MongoDB connection
+    const client = await clientPromise;
+    const db = client.db("test"); // Ensure this matches your database name
+    const collection = db.collection("appointments");
 
-        if (req.method === "GET") {
-            const { userId } = req.query;
-            if (!userId) {
-                return res.status(400).json({ error: "User ID is required" });
-            }
-            const appointments = await db.collection("appointments").find({ userId }).toArray();
-            return res.status(200).json({ appointments });
-        } 
-        
-        else if (req.method === "POST") {
-            const { doctorId, userId, date, time, status } = req.body;
-            if (!doctorId || !userId || !date || !time) {
-                return res.status(400).json({ error: "Missing required fields" });
-            }
-            const result = await db.collection("appointments").insertOne({ doctorId, userId, date, time, status: status || "pending" });
-            return res.status(201).json({ message: "Appointment created", appointmentId: result.insertedId });
-        } 
-        
-        else {
-            res.setHeader("Allow", ["GET", "POST"]);
-            return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
-        }
-    } catch (error) {
-        return res.status(500).json({ error: "Internal Server Error" });
+    // Extract userId from query parameters
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("userId");
+
+    if (!userId) {
+      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
+
+    // Fetch appointments for the user
+    const appointments = await collection.find({ userId }).toArray();
+
+    return NextResponse.json({ appointments }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching appointments:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch appointments" },
+      { status: 500 }
+    );
+  }
 }
