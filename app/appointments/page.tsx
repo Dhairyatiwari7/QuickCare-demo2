@@ -36,28 +36,27 @@ export default function AppointmentsPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!user || !user._id) return;
+    if (!user || !user._id) {
+      setLoading(false);
+      return;
+    }
 
     async function fetchAppointments() {
       setLoading(true);
       setError(null);
       try {
         const response = await fetch(`/api/appointment?userId=${user._id}`);
-
         if (!response.ok) {
           throw new Error("Failed to fetch appointments");
         }
+
         const data = await response.json();
-
         console.log("API Response:", data);
-        console.log("Type of appointments:", typeof data.appointments);
-        console.log("Is Array:", Array.isArray(data.appointments));
 
-        // Ensure data.appointments is an array
-        if (!Array.isArray(data.appointments)) {
+        // Validate the API response to prevent 'filter is not a function' errors
+        if (!data || !Array.isArray(data.appointments)) {
           console.error("Invalid API response format:", data);
-          setAppointments([]); // Fallback to empty array
-          return;
+          throw new Error("Unexpected response format. Please try again.");
         }
 
         setAppointments(data.appointments);
@@ -71,13 +70,16 @@ export default function AppointmentsPage() {
 
     fetchAppointments();
 
-    gsap.from(".appointment-card", {
-      opacity: 0,
-      y: 20,
-      stagger: 0.1,
-      duration: 0.8,
-      ease: "power3.out",
-    });
+    // Ensure GSAP runs only when appointments are updated
+    if (appointments.length > 0) {
+      gsap.from(".appointment-card", {
+        opacity: 0,
+        y: 20,
+        stagger: 0.1,
+        duration: 0.8,
+        ease: "power3.out",
+      });
+    }
   }, [user]);
 
   if (!user) {
@@ -125,7 +127,9 @@ export default function AppointmentsPage() {
           {appointments.map((appointment) => (
             <Card key={appointment._id} className="appointment-card">
               <CardHeader>
-                <CardTitle>Doctor: {appointment.doctor?.name || "Unknown Doctor"}</CardTitle>
+                <CardTitle>
+                  Doctor: {appointment.doctor?.name || "Unknown Doctor"}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <p>Speciality: {appointment.doctor?.speciality || "Not available"}</p>

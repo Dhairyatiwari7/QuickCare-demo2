@@ -11,7 +11,6 @@ export async function GET(req: NextRequest) {
     // Extract userId from query parameters
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
-
     if (!userId) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
@@ -21,10 +20,11 @@ export async function GET(req: NextRequest) {
 
     // Fetch appointments
     const appointments = await collection.find(query).toArray();
+    console.log("API Raw Response:", JSON.stringify({ appointments }, null, 2));
 
     console.log("Fetched appointments:", appointments); // Debugging
-
-    return NextResponse.json({ appointments: appointments ?? [] }, { status: 200 });
+    
+    return NextResponse.json({ appointments: Array.isArray(appointments) ? appointments : [] }, { status: 200 });
   } catch (error) {
     console.error("Error fetching appointments:", error);
     return NextResponse.json({ error: "Failed to fetch appointments" }, { status: 500 });
