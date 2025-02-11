@@ -49,10 +49,15 @@ export default function AppointmentsPage() {
         }
         const data = await response.json();
 
-        console.log("Fetched Appointments:", data);
+        console.log("API Response:", data);
+        console.log("Type of appointments:", typeof data.appointments);
+        console.log("Is Array:", Array.isArray(data.appointments));
 
+        // Ensure data.appointments is an array
         if (!Array.isArray(data.appointments)) {
-          throw new Error("Invalid data format: Expected an array");
+          console.error("Invalid API response format:", data);
+          setAppointments([]); // Fallback to empty array
+          return;
         }
 
         setAppointments(data.appointments);

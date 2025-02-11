@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import clientPromise from "../../lib/db"; // Ensure this is the correct path to your database connection
+import clientPromise from "../../lib/db";
+import { ObjectId } from "mongodb"; // Import ObjectId
 
 export async function GET(req: NextRequest) {
   try {
-    // Get MongoDB connection
     const client = await clientPromise;
-    const db = client.db("test"); // Ensure this matches your database name
+    const db = client.db("test");
     const collection = db.collection("appointments");
 
     // Extract userId from query parameters
@@ -16,15 +16,17 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
 
-    // Fetch appointments for the user
-    const appointments = await collection.find({ userId }).toArray();
+    // Convert userId to ObjectId if stored as ObjectId in MongoDB
+    const query = ObjectId.isValid(userId) ? { userId: new ObjectId(userId) } : { userId };
 
-    return NextResponse.json({ appointments }, { status: 200 });
+    // Fetch appointments
+    const appointments = await collection.find(query).toArray();
+
+    console.log("Fetched appointments:", appointments); // Debugging
+
+    return NextResponse.json({ appointments: appointments ?? [] }, { status: 200 });
   } catch (error) {
     console.error("Error fetching appointments:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch appointments" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch appointments" }, { status: 500 });
   }
 }
