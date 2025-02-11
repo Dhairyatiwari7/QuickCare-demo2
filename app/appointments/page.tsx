@@ -43,7 +43,7 @@ export default function AppointmentsPage() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/appointment?userId=${user._id}`);
+      const response = await fetch(`/api/appointment?userId=abc1234`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch appointments");
