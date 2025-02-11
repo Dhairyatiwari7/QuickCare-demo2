@@ -5,8 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
-import doctor from "../models/doctor";
-
 type AuthUser = {
   _id: string;
   username: string;

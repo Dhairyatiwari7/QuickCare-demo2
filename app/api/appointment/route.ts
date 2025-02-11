@@ -58,13 +58,14 @@ type Appointment = {
           $project: {
             _id: { $toString: "$_id" },
             doctorId: { $toString: "$doctorId" },
+
             userId: 1,
             date: 1,
             time: 1,
             status: 1,
             doctor: {
               _id: { $toString: "$doctorInfo._id" },
-              name: "$doctorInfo.name",
+              name: "Dr A Sharma",
               speciality: "$doctorInfo.speciality"
             }
           }
