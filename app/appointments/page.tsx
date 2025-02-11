@@ -56,7 +56,7 @@ export default function AppointmentsPage() {
           console.error("Invalid API response format:", data);
           throw new Error("Unexpected response format");
         }
-  
+        console.log("API response:", data);
         setAppointments(data.appointments);
       } catch (error) {
         console.error("Error fetching appointments:", error);
