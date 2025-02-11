@@ -1,31 +1,49 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useParams } from "next/navigation"
-import { gsap } from "gsap"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-const patientDetails = {
-  1: {
-    name: "Alice Johnson",
-    age: 35,
-    condition: "Chronic Migraine",
-    symptoms: ["Severe headaches", "Sensitivity to light", "Nausea"],
-    history:
-      "Patient has been experiencing migraines for the past 5 years, with increasing frequency in recent months.",
-    medications: ["Sumatriptan", "Propranolol"],
-    lastVisit: "2024-01-15",
-    notes:
-      "Patient reports stress as a major trigger. Recommended lifestyle modifications and stress management techniques.",
-  },
-  // Add more patient details...
-}
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import { gsap } from "gsap";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function PatientDetailPage() {
-  const { id } = useParams()
-  const patient = patientDetails[id as string]
+  const { id } = useParams();
+  interface Patient {
+    name: string;
+    age: number;
+    condition: string;
+    symptoms: string[];
+    history: string;
+    medications: string[];
+    notes: string;
+    lastVisit: string;
+  }
+
+  const [patient, setPatient] = useState<Patient | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
+    if (!id) return;
+
+    // Fetch patient details from API
+    const fetchPatientDetails = async () => {
+      try {
+        const res = await fetch(`/api/patient/${id}`);
+        if (!res.ok) throw new Error("Failed to fetch patient details");
+        const data = await res.json();
+        setPatient(data);
+      } catch (err) {
+        setError("Patient not found");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatientDetails();
+  }, [id]);
+
+  useEffect(() => {
+    if (!patient) return;
     gsap.from(".detail-card", {
       opacity: 0,
       y: 50,
@@ -33,10 +51,12 @@ export default function PatientDetailPage() {
       duration: 1,
       stagger: 0.2,
       ease: "power3.out",
-    })
-  }, [])
+    });
+  }, [patient]);
 
-  if (!patient) return <div>Patient not found</div>
+  if (loading) return <div>Loading patient details...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
+  if (!patient) return <div>No patient data available</div>;
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -69,7 +89,7 @@ export default function PatientDetailPage() {
             <p>{patient.condition}</p>
             <p className="font-semibold mt-4">Symptoms:</p>
             <ul className="list-disc list-inside">
-              {patient.symptoms.map((symptom, index) => (
+              {patient.symptoms.map((symptom: string, index: number) => (
                 <li key={index}>{symptom}</li>
               ))}
             </ul>
@@ -91,7 +111,7 @@ export default function PatientDetailPage() {
           </CardHeader>
           <CardContent>
             <ul className="list-disc list-inside">
-              {patient.medications.map((medication, index) => (
+              {patient.medications.map((medication: string, index: number) => (
                 <li key={index}>{medication}</li>
               ))}
             </ul>
@@ -111,6 +131,5 @@ export default function PatientDetailPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
-
