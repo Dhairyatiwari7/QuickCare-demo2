@@ -129,7 +129,10 @@ export default function AppointmentPage() {
             <CardFooter>
               <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <DialogTrigger asChild>
-                  <Button className="w-full" onClick={() => setSelectedDoctor(doctor)}>
+                <Button className="w-full" onClick={() => {
+            setSelectedDoctor(doctor);
+            setIsDialogOpen(true);
+          }}>
                     Book Appointment
                   </Button>
                 </DialogTrigger>

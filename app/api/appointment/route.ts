@@ -16,11 +16,17 @@ type Appointment = {
   };
 };
 
-export async function GET(req: NextRequest) {
+
+/**
+ * GET /api/appointment
+ * Fetch all appointments for the given user id.
+ * @param {NextRequest} req
+ * @returns {Promise<NextResponse>}
+ */export async function GET(req: NextRequest) {
   try {
     const client = await clientPromise;
     const db = client.db("test");
-    const appointmentsCollection = db.collection<Appointment>("appointments");
+    const appointmentsCollection = db.collection<Appointment>("Appointment");
 
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get("userId");
@@ -73,6 +79,41 @@ export async function GET(req: NextRequest) {
     console.error("Error fetching appointments:", error);
     return NextResponse.json(
       { error: "Failed to fetch appointments" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("test");
+    const appointmentsCollection = db.collection<Appointment>("Appointment");
+
+    const { doctorId, userId, date, time } = await req.json();
+
+    if (!doctorId || !userId || !date || !time) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    const newAppointment = {
+      doctorId,
+      userId,
+      date,
+      time,
+      status: "pending" as const
+    };
+
+    const result = await appointmentsCollection.insertOne(newAppointment);
+
+    return NextResponse.json({ 
+      success: true, 
+      appointmentId: result.insertedId.toString() 
+    }, { status: 201 });
+  } catch (error) {
+    console.error("Error booking appointment:", error);
+    return NextResponse.json(
+      { error: "Failed to book appointment" },
       { status: 500 }
     );
   }
