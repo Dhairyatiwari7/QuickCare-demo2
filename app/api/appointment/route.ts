@@ -1,19 +1,34 @@
-import { NextResponse } from "next/server";
-import clientPromise from "../../lib/db"; // ✅ Ensure correct import
+import { NextApiRequest, NextApiResponse } from "next";
+import clientPromise from "../../lib/db";
 
-export async function GET() {
-  try {
-    console.log("🔹 Connecting to MongoDB...");
-    const client = await clientPromise;
-    const db = client.db("test"); // ✅ Ensure database name is correct
-    const appointments = await db.collection("appointments").find().toArray();
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    try {
+        const client = await clientPromise;
+        const db = client.db("test");
 
-    return NextResponse.json({ appointments });
-  } catch (error) {
-    console.error("❌ Error fetching appointments:", error);
-    return NextResponse.json(
-      { message: "Internal server error" },
-      { status: 500 }
-    );
-  }
+        if (req.method === "GET") {
+            const { userId } = req.query;
+            if (!userId) {
+                return res.status(400).json({ error: "User ID is required" });
+            }
+            const appointments = await db.collection("appointments").find({ userId }).toArray();
+            return res.status(200).json({ appointments });
+        } 
+        
+        else if (req.method === "POST") {
+            const { doctorId, userId, date, time, status } = req.body;
+            if (!doctorId || !userId || !date || !time) {
+                return res.status(400).json({ error: "Missing required fields" });
+            }
+            const result = await db.collection("appointments").insertOne({ doctorId, userId, date, time, status: status || "pending" });
+            return res.status(201).json({ message: "Appointment created", appointmentId: result.insertedId });
+        } 
+        
+        else {
+            res.setHeader("Allow", ["GET", "POST"]);
+            return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
 }
