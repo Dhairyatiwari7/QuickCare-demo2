@@ -15,21 +15,23 @@ interface Doctor {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  if (req.method !== 'GET') {
-    res.status(405).json({ message: 'Method not allowed' });
-    return;
-  }
-
-  try {
-    const client: MongoClient = await clientPromise;
-    const db: Db = client.db("test");
-    
-    const collection: Collection<Doctor> = db.collection("doctors");
-    const doctors: Doctor[] = await collection.find({}).toArray();
-    
-    res.status(200).json(doctors);
-  } catch (error) {
-    console.error("Error fetching doctors:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
+    if (req.method !== 'GET') {
+      res.status(405).json({ message: 'Method not allowed' });
+      return;
+    }
+  
+    try {
+      const client: MongoClient = await clientPromise;
+      const db: Db = client.db("test");
+      
+      const collection: Collection<Doctor> = db.collection("doctors");
+      const doctors: Doctor[] = await collection.find({}).toArray();
+      
+      res.status(200).json(doctors);
+    } catch (error) {
+      console.error("Error fetching doctors:", error);
+      res.status(500).json({ error: "Internal Server Error" });
+    }
 }
+  
+
