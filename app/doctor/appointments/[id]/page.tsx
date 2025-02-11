@@ -23,7 +23,7 @@ const patientDetails = {
 
 export default function PatientDetailPage() {
   const { id } = useParams()
-  const patient = patientDetails[id as keyof typeof patientDetails]
+  const patient = patientDetails[id as string]
 
   useEffect(() => {
     gsap.from(".detail-card", {

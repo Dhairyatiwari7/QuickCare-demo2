@@ -4,9 +4,10 @@ import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
 
 type User = {
-  username: string
-  role: "user" | "doctor"
-}
+  _id: string; // <-- Add this line
+  username: string;
+  role: "user" | "doctor";
+};
 
 type AuthContextType = {
   user: User | null
@@ -31,7 +32,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (username: string, password: string) => {
     // Here you would typically make an API call to verify credentials
     // For this example, we'll just set the user directly
-    const newUser = { username, role: "user" as const }
+    const newUser = { _id: "someUniqueId", username, role: "user" as const }
     setUser(newUser)
     localStorage.setItem("user", JSON.stringify(newUser))
   }
@@ -39,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signup = async (username: string, password: string, role: "user" | "doctor") => {
     // Here you would typically make an API call to create a new user
     // For this example, we'll just set the user directly
-    const newUser = { username, role }
+    const newUser = { _id: "someUniqueId", username, role }
     setUser(newUser)
     localStorage.setItem("user", JSON.stringify(newUser))
   }
