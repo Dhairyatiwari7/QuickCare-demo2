@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { useAuth } from "../contexts/AuthContext";
+import Image from "next/image";
+
 type AuthUser = {
   _id: string;
   username: string;
@@ -15,6 +17,10 @@ type Doctor = {
   _id: string;
   name: string;
   speciality: string;
+  image?: string;
+  fees?: number;
+  availability?: string;
+  rating?: number;
 };
 
 type Appointment = {
@@ -28,14 +34,14 @@ type Appointment = {
 };
 
 export default function AppointmentsPage() {
-  const { user  } = useAuth();
+  const { user } = useAuth();
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (user === null ) return; 
+    if (user === null) return;
     console.log("User is logged in:", user);
 
     if (!user) {
@@ -44,12 +50,11 @@ export default function AppointmentsPage() {
       return;
     }
 
-
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(/api/appointments/user/${user.username});
+        const response = await fetch(`/api/appointments/user/${user.username}`);
         if (!response.ok) {
-          throw new Error(HTTP error! status: ${response.status});
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         console.log("Fetched appointments:", data);
@@ -70,6 +75,19 @@ export default function AppointmentsPage() {
     fetchAppointments();
   }, [user]);
 
+  function isValidAppointment(appointment: any): appointment is Appointment {
+    return (
+      typeof appointment === "object" &&
+      appointment !== null &&
+      typeof appointment._id === "string" &&
+      typeof appointment.doctorId === "string" &&
+      typeof appointment.userId === "string" &&
+      typeof appointment.date === "string" &&
+      typeof appointment.time === "string" &&
+      ["pending", "confirmed", "cancelled"].includes(appointment.status)
+    );
+  }
+
   if (loading) {
     return <div className="text-center py-12">Loading appointments...</div>;
   }
@@ -84,27 +102,29 @@ export default function AppointmentsPage() {
       {appointments.length > 0 ? (
         <div className="grid gap-6">
           {appointments.map((appointment) => (
-            <Card key={appointment.id} className="appointment-card">
+            <Card key={appointment._id} className="appointment-card">
               <CardHeader className="flex flex-row items-center gap-4">
-                <Image
-                  src={appointment.doctor.image}
-                  alt={appointment.doctor.name}
-                  width={64}
-                  height={64}
-                  className="rounded-full"
-                />
+                {appointment.doctor?.image && (
+                  <Image
+                    src={appointment.doctor.image}
+                    alt={appointment.doctor.name}
+                    width={64}
+                    height={64}
+                    className="rounded-full"
+                  />
+                )}
                 <div>
-                  <CardTitle>{appointment.doctor.name}</CardTitle>
-                  <CardDescription>{appointment.doctor.speciality}</CardDescription>
+                  <CardTitle>{appointment.doctor?.name || "Unknown Doctor"}</CardTitle>
+                  <CardDescription>{appointment.doctor?.speciality || "No Speciality"}</CardDescription>
                 </div>
               </CardHeader>
               <CardContent>
                 <p>Date: {new Date(appointment.date).toLocaleDateString()}</p>
                 <p>Time: {appointment.time}</p>
                 <p className="capitalize">Status: {appointment.status}</p>
-                <p>Fees: ₹{appointment.doctor.fees}</p>
-                <p>Doctor's Availability: {appointment.doctor.availability}</p>
-                <p>Rating: {appointment.doctor.rating}/5</p>
+                {appointment.doctor?.fees && <p>Fees: ₹{appointment.doctor.fees}</p>}
+                {appointment.doctor?.availability && <p>Availability: {appointment.doctor.availability}</p>}
+                {appointment.doctor?.rating && <p>Rating: {appointment.doctor.rating}/5</p>}
               </CardContent>
             </Card>
           ))}
@@ -121,5 +141,5 @@ export default function AppointmentsPage() {
         </Button>
       </div>
     </div>
-  )
+  );
 }
