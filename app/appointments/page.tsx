@@ -34,18 +34,17 @@ export default function AppointmentsPage() {
   const [error, setError] = useState<string | null>(null);
 
   const fetchAppointments = useCallback(async () => {
-    const id='67a8784463abd080a76198ca';
-    // if (!user || !user._id) {
-    //   setLoading(false);
-    //   return;
-    // }
-
+    if (!user || !user._id) {
+      setLoading(false);
+      return;
+    }
+  
     setLoading(true);
     setError(null);
-    console.log(id);
+  
     try {
       const response = await fetch(`/api/appointment?userId=${user._id}`);
-
+  
       if (!response.ok) {
         throw new Error("Failed to fetch appointments");
       }
@@ -55,12 +54,11 @@ export default function AppointmentsPage() {
       if (!data || !Array.isArray(data.appointments)) {
         throw new Error("Invalid response format");
       }
-
-      // Sort appointments by date, most recent first
+  
       const sortedAppointments: Appointment[] = data.appointments.sort((a: Appointment, b: Appointment) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
-
+  
       setAppointments(sortedAppointments);
     } catch (error) {
       console.error("Error fetching appointments:", error);
