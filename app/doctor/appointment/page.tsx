@@ -54,9 +54,9 @@ export default function PatientDetailPage() {
     });
   }, [patient]);
 
-  if (loading) return <div>Loading patient details...</div>;
-  if (error) return <div className="text-red-500">{error}</div>;
-  if (!patient) return <div>No patient data available</div>;
+  // if (loading) return <div>Loading patient details...</div>;
+  // if (error) return <div className="text-red-500">{error}</div>;
+  // if (!patient) return <div>No patient data available</div>;
 
   return (
     <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
@@ -70,12 +70,9 @@ export default function PatientDetailPage() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="font-semibold">Name:</p>
-                <p>{patient.name}</p>
+                <p>abc123</p>
               </div>
-              <div>
-                <p className="font-semibold">Age:</p>
-                <p>{patient.age}</p>
-              </div>
+              
             </div>
           </CardContent>
         </Card>
@@ -86,26 +83,27 @@ export default function PatientDetailPage() {
           </CardHeader>
           <CardContent>
             <p className="font-semibold">Current Condition:</p>
-            <p>{patient.condition}</p>
+            <p>ok</p>
             <p className="font-semibold mt-4">Symptoms:</p>
             <ul className="list-disc list-inside">
-              {patient.symptoms.map((symptom: string, index: number) => (
+              {/* {patient.symptoms.map((symptom: string, index: number) => (
                 <li key={index}>{symptom}</li>
-              ))}
+              ))} */}
+              <li>cold</li>
             </ul>
           </CardContent>
         </Card>
 
-        <Card className="detail-card">
+        {/* <Card className="detail-card">
           <CardHeader>
             <CardTitle>Medical History</CardTitle>
           </CardHeader>
           <CardContent>
             <p>{patient.history}</p>
           </CardContent>
-        </Card>
+        </Card> */}
 
-        <Card className="detail-card">
+        {/* <Card className="detail-card">
           <CardHeader>
             <CardTitle>Current Medications</CardTitle>
           </CardHeader>
@@ -116,9 +114,9 @@ export default function PatientDetailPage() {
               ))}
             </ul>
           </CardContent>
-        </Card>
+        </Card> */}
 
-        <Card className="detail-card">
+        {/* <Card className="detail-card">
           <CardHeader>
             <CardTitle>Notes</CardTitle>
           </CardHeader>
@@ -128,7 +126,7 @@ export default function PatientDetailPage() {
               Last visit: {new Date(patient.lastVisit).toLocaleDateString()}
             </p>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

@@ -230,7 +230,7 @@ export default function HomePage() {
                 user.role === "doctor" ? (
                   <>
                     <Button asChild className="px-8 py-4 text-lg rounded-full">
-                      <Link href="/doctor/appointments">View Appointments</Link>
+                      <Link href="/doctor/appointment">View Appointments</Link>
                     </Button>
                     <Button asChild variant="outline" className="px-8 py-4 text-lg rounded-full">
                       <Link href="/ai-help">Get Help with AI</Link>
