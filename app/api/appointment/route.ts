@@ -115,10 +115,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
     
-    const newAppointment = {
-      doctorId: '67aa326e4c09158a3b227873',
-      userId   : '67a8784463abd080a76198ca',
-      name : 'A Sharma',
+    const newAppointment: Appointment = {
+      doctorId: new ObjectId('67aa326e4c09158a3b227873'),
+      userId: new ObjectId('67a8784463abd080a76198ca'),
       date,
       time,
       status
@@ -133,7 +132,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Error booking appointment:", error);
     return NextResponse.json(
-      { error: "Failed to book appointment", details: error.message },
+      { error: "Failed to book appointment", details: (error as Error).message },
       { status: 500 }
     );
   }
