@@ -57,7 +57,7 @@ export default function AppointmentsPage() {
       }
 
       // Sort appointments by date, most recent first
-      const sortedAppointments = data.appointments.sort((a, b) => 
+      const sortedAppointments: Appointment[] = data.appointments.sort((a: Appointment, b: Appointment) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
       );
 
